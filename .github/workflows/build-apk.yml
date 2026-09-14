@@ -3,7 +3,9 @@ name: Construire APK ZTV Moyenne
 on:
   workflow_dispatch:
   push:
-    branches: [ main, master ]
+    branches:
+      - main
+      - master
 
 jobs:
   build-apk:
@@ -22,11 +24,11 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - - name: Installer Android SDK
-  uses: android-actions/setup-android@v4
-  with:
-    cmdline-tools-version: 12266719
-    packages: ''
+      - name: Installer Android SDK
+        uses: android-actions/setup-android@v4
+        with:
+          cmdline-tools-version: 12266719
+
       - name: Installer Gradle
         uses: gradle/actions/setup-gradle@v4
 
@@ -34,6 +36,7 @@ jobs:
         run: |
           mkdir -p app/src/main/assets
           mkdir -p app/src/main/java/com/ztv/moyenne
+          mkdir -p app/src/main/res/values
 
           cp index.html app/src/main/assets/index.html
 
@@ -83,6 +86,15 @@ jobs:
           }
           EOF
 
+          cat > app/src/main/res/values/styles.xml <<'EOF'
+          <resources>
+              <style name="AppTheme" parent="android:style/Theme.Material.Light.NoActionBar">
+                  <item name="android:fontFamily">sans</item>
+                  <item name="android:colorAccent">#000000</item>
+              </style>
+          </resources>
+          EOF
+
           cat > app/src/main/AndroidManifest.xml <<'EOF'
           <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
@@ -105,17 +117,6 @@ jobs:
               </application>
 
           </manifest>
-          EOF
-
-          mkdir -p app/src/main/res/values
-
-          cat > app/src/main/res/values/styles.xml <<'EOF'
-          <resources>
-              <style name="AppTheme" parent="android:style/Theme.Material.Light.NoActionBar">
-                  <item name="android:fontFamily">sans</item>
-                  <item name="android:colorAccent">#000000</item>
-              </style>
-          </resources>
           EOF
 
           cat > app/src/main/java/com/ztv/moyenne/MainActivity.java <<'EOF'
